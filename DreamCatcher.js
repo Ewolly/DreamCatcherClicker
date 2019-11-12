@@ -1,34 +1,72 @@
 var app = new Vue({ 
     el: '#app',
     data: {
-        Title: 'Welcome to the DreamCatcher!', 
-        Description: 'In DreamCatcher, your goal is to generate power through your dreams and revolutionise the world!',
-        Story1: 'Click the Button!',
-        Story2: '',
-        Story3: '',
-        Story4: ''
-    }
-});
+        title: 'You are the DreamCatcher™.',
+        daysSlept: 0,
+        goodDreams: 0,
+        badDreams: 0
+    },
+    computed: {
+        timeSlept: function () {
+            years = Math.floor(this.daysSlept / 360);
+            months = Math.floor((this.daysSlept % 360) / 30);
+            days = this.daysSlept % 30;
 
-var app5 = new Vue({
-  el: '#app-5',
-  data: {
-    count: 0
-  },
-  methods: {
-    addDream: function () {
-        this.count = this.count + 1
-        if (this.count == 1){
-            app.Story1 = 'As you lay down for your first nights sleep, you begin to think...'
-            app.Story2 = 'What if you could use your time asleep productively'
-            app.Story3 = 'Maybe tomorrow you think, as sleep over takes you'
+            outputString = '';
+            if (years > 0) {
+                outputString += years;
+
+                outputString += (years > 1 ? ' years' : ' year');
+                outputString += ((months > 0 || days > 0) ? ', ' : '');
+            }
+
+            if (months > 0) {
+                outputString += months;
+
+                outputString += (months > 1 ? ' months' : ' month');
+                outputString += (days > 0 ? ', ' : '');
+            }
+
+            if (days > 0) {
+                outputString += days;
+
+                outputString += (days > 1 ? ' days' : ' day');
+            }
+
+            return outputString;
+        },
+        storyText: function () {
+            if (this.daysSlept >= 10 && this.daysSlept <= 20) {
+                return `<p>
+                            As you lay down for your first nights sleep, you begin to think...<br />
+                            What if you could use your time asleep productively?<br />
+                            Maybe tomorrow you think, as sleep over takes you<br />
+                        </p>`
+            } else if (this.daysSlept >= 30) {
+                return `<p>
+                            Could I do something with my dreams?'<br />
+                            It seems silly, absurd almost...<br />
+                            But why else would dream catchers even exist?<br />
+                            This has to be the use!
+                        </p>`
+            } else {
+                return ''
+            }
         }
-        if (this.count == 2){
-            app.Story1 = 'A dream catcher perhaps?'
-            app.Story2 = 'It seems silly, absurd almost...'
-            app.Story3 = 'But why else would dream catchers even exist?'
-            app.Stroy4 = 'This has to be the use!'
+    },
+
+    methods: {
+        sleep: function () {
+            this.daysSlept++;
+
+            if (this.daysSlept >= 30) {
+                roll = Math.random();
+                if (roll < 0.05) {
+                    this.badDreams++;
+                } else if (roll < 0.4) {
+                    this.goodDreams++;
+                }
+            }
         }
     }
-  }
 })
