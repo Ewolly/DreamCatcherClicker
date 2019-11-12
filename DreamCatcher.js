@@ -1,7 +1,13 @@
 gameData = {
     daysSlept: 0,
     goodDreams: 0,
-    badDreams: 0
+    badDreams: 0,
+    clickTime: 5000,
+    dcPurchased: 0,
+    upgrades: {
+        electricity: false,
+        sleepSchedule: false
+    }
 };
 
 var app = new Vue({ 
@@ -22,6 +28,11 @@ var app = new Vue({
                 this.save();
             },1000);
         })
+
+        if (this.upgrades.sleepSchedule) {
+            this.upgrades.sleepSchedule = false;
+            this.startAutoClicker();
+        }
  
     },
     computed: {
@@ -32,23 +43,19 @@ var app = new Vue({
 
             outputString = '';
             if (years > 0) {
-                outputString += years;
-
-                outputString += (years > 1 ? ' years' : ' year');
-                outputString += ((months > 0 || days > 0) ? ', ' : '');
+                outputString += years +
+                    (years > 1 ? ' years' : ' year') +
+                    ((months > 0 || days > 0) ? ', ' : '');
             }
 
             if (months > 0) {
-                outputString += months;
-
-                outputString += (months > 1 ? ' months' : ' month');
-                outputString += (days > 0 ? ', ' : '');
+                outputString += months + 
+                    (months > 1 ? ' months' : ' month') +
+                    (days > 0 ? ', ' : '');
             }
 
             if (days > 0) {
-                outputString += days;
-
-                outputString += (days > 1 ? ' days' : ' day');
+                outputString += days + (days > 1 ? ' days' : ' day');
             }
 
             return outputString;
@@ -60,12 +67,18 @@ var app = new Vue({
                             What if you could use your time asleep productively?<br />
                             Maybe tomorrow you think, as sleep over takes you<br />
                         </p>`
-            } else if (this.daysSlept >= 30) {
+            } else if (this.daysSlept >= 30 && this.dcPurchased == 0) {
                 return `<p>
-                            Could I do something with my dreams?'<br />
+                            Could I do something with my dreams?<br />
                             It seems silly, absurd almost...<br />
                             But why else would dream catchers even exist?<br />
                             This has to be the use!
+                        </p>`
+            } else if (this.dcPurchased && this.daysSlept >= (this.dcPurchased + 10) && !this.upgrades.electricity) {
+                return `<p>
+                            The dream catcher is allowing me to generate power<br />
+                            Buy putting the power back into the grid, the power companys actually sending me money!!<br />
+                            I NEED MORE<br />
                         </p>`
             } else {
                 return ''
@@ -77,12 +90,14 @@ var app = new Vue({
         sleep: function () {
             this.daysSlept++;
 
-            if (this.daysSlept >= 30) {
-                roll = Math.random();
-                if (roll < 0.05) {
-                    this.badDreams++;
-                } else if (roll < 0.4) {
-                    this.goodDreams++;
+            if (dcPurchased) {
+                if (this.daysSlept >= 30) {
+                    roll = Math.random();
+                    if (roll < 0.05) {
+                        this.badDreams++;
+                    } else if (roll < 0.4) {
+                        this.goodDreams++;
+                    }
                 }
             }
         },
@@ -90,7 +105,13 @@ var app = new Vue({
             Object.assign(gameData, {
                 daysSlept: 0,
                 goodDreams: 0,
-                badDreams: 0
+                badDreams: 0,
+                clickTime: 5000,
+                dcPurchased: 0,
+                upgrades: {
+                    electricity: false,
+                    sleepSchedule: false
+                }
             });
 
             this.save();
@@ -98,6 +119,19 @@ var app = new Vue({
         save: function () {
             const parsed = JSON.stringify(gameData);
             localStorage.setItem('dcData', parsed);
+        },
+        startElectricity: function () {
+            this.upgrades.electricity = true;
+        },
+        startAutoClicker: function () {
+            if (!this.upgrades.sleepSchedule){
+                this.$nextTick(function () {
+                    window.setInterval(() => {
+                        this.sleep();
+                    },this.clickTime);
+                })
+            }
+            this.upgrades.sleepSchedule = true;
         }
     }
 })

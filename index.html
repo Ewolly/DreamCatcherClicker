@@ -9,7 +9,7 @@
 
     <body>
         <div id="app">
-            <h3>You are the DreamCatcher™.</h3>
+            <h2>You are the DreamCatcher™.</h2>
 
             <transition name="fade">
                 <div v-if="storyText != ''" v-html="storyText"></div>
@@ -26,8 +26,26 @@
                 <p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
             </transition>
 
-            <button @click="sleep">Sleep</button><br /><br />
-            <button @click="devReset">(DEV) Reset</button>
+            <button @click="sleep">Sleep</button>
+            <!-- <button @click="harvestElec">Sleep</button> -->
+
+            <transition name="fade">
+                <div id="upgrades" v-if="daysSlept >= 30">
+                    <transition name="fade">
+                            <button v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
+                    </transition>
+        
+                    <transition name="fade">
+                        <button v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
+                    </transition>
+
+                    <transition name="fade">
+                        <button v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
+                    </transition>
+                </div>
+            </transition>
+            
+            <br /><br /><button @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
         </div>
 
         <script src="DreamCatcher.js"></script>
