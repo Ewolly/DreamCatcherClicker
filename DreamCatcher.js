@@ -1,10 +1,28 @@
+gameData = {
+    daysSlept: 0,
+    goodDreams: 0,
+    badDreams: 0
+};
+
 var app = new Vue({ 
     el: '#app',
-    data: {
-        title: 'You are the DreamCatcher™.',
-        daysSlept: 0,
-        goodDreams: 0,
-        badDreams: 0
+    data: gameData,
+    mounted() {
+        if (localStorage.getItem('dcData')) {
+            try {
+                parsed = JSON.parse(localStorage.getItem('dcData'));
+                Object.assign(gameData, parsed);
+            } catch (e) {
+                localStorage.removeItem('dcData');
+            }
+        }
+
+        this.$nextTick(function () {
+            window.setInterval(() => {
+                this.save();
+            },1000);
+        })
+ 
     },
     computed: {
         timeSlept: function () {
@@ -67,6 +85,19 @@ var app = new Vue({
                     this.goodDreams++;
                 }
             }
+        },
+        devReset: function () {
+            Object.assign(gameData, {
+                daysSlept: 0,
+                goodDreams: 0,
+                badDreams: 0
+            });
+
+            this.save();
+        },
+        save: function () {
+            const parsed = JSON.stringify(gameData);
+            localStorage.setItem('dcData', parsed);
         }
     }
 })

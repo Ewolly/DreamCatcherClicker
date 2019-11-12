@@ -9,7 +9,7 @@
 
     <body>
         <div id="app">
-            <h3>{{ title }}</h3>
+            <h3>You are the DreamCatcher™.</h3>
 
             <transition name="fade">
                 <div v-if="storyText != ''" v-html="storyText"></div>
@@ -26,7 +26,8 @@
                 <p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
             </transition>
 
-            <button @click="sleep">Sleep</button>
+            <button @click="sleep">Sleep</button><br /><br />
+            <button @click="devReset">(DEV) Reset</button>
         </div>
 
         <script src="DreamCatcher.js"></script>
