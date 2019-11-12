@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="DreamCatcher.css">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <h3>You are the DreamCatcher™.</h3>
+
+            <transition name="fade">
+                <div v-if="storyText != ''" v-html="storyText"></div>
+            </transition>
+
+            <transition name="fade">
+                <p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
+            </transition>
+
+            <transition name="fade">
+                <p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+            </transition>
+            <transition name="fade">
+                <p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+            </transition>
+
+            <button @click="sleep">Sleep</button><br /><br />
+            <button @click="devReset">(DEV) Reset</button>
+        </div>
+
+        <script src="DreamCatcher.js"></script>
+    </body>
+</html>
