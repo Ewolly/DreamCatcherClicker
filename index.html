@@ -1,53 +1,53 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<head>
+				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        <link rel="stylesheet" href="DreamCatcher.css">
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    </head>
+				<link rel="stylesheet" href="DreamCatcher.css">
+				<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		</head>
 
-    <body>
-        <div id="app">
-            <h2>You are the DreamCatcher™.</h2>
+		<body>
+				<div id="app">
+						<h2>You are the DreamCatcher™.</h2>
 
-            <transition name="fade">
-                <div v-if="storyText != ''" v-html="storyText"></div>
-            </transition>
+						<transition name="fade">
+								<div v-if="storyText != ''" v-html="storyText"></div>
+						</transition>
 
-            <transition name="fade">
-                <p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
-            </transition>
+						<transition name="fade">
+								<p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
+						</transition>
 
-            <transition name="fade">
-                <p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
-            </transition>
-            <transition name="fade">
-                <p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
-            </transition>
+						<transition name="fade">
+								<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						</transition>
+						<transition name="fade">
+								<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						</transition>
 
-            <button @click="sleep">Sleep</button>
-            <!-- <button @click="harvestElec">Sleep</button> -->
+						<button @click="sleep">Sleep</button>
+						<!-- <button @click="harvestElec">Sleep</button> -->
 
-            <transition name="fade">
-                <div id="upgrades" v-if="daysSlept >= 30">
-                    <transition name="fade">
-                            <button v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
-                    </transition>
-        
-                    <transition name="fade">
-                        <button v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
-                    </transition>
+						<transition name="fade">
+								<div id="upgrades" v-if="daysSlept >= 30">
+										<transition name="fade">
+														<button v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
+										</transition>
+				
+										<transition name="fade">
+												<button v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
+										</transition>
 
-                    <transition name="fade">
-                        <button v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
-                    </transition>
-                </div>
-            </transition>
-            
-            <br /><br /><button @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
-        </div>
+										<transition name="fade">
+												<button v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
+										</transition>
+								</div>
+						</transition>
+						
+						<br /><br /><button @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
+				</div>
 
-        <script src="DreamCatcher.js"></script>
-    </body>
+				<script src="DreamCatcher.js"></script>
+		</body>
 </html>
