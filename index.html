@@ -2,51 +2,81 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
 		<link rel="stylesheet" href="DreamCatcher.css">
+
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	</head>
 
-	<body>
-		<div id="app">
-			<h2>You are the DreamCatcher™.</h2>
-
-			<transition name="fade">
-				<div v-if="storyText != ''" v-html="storyText"></div>
-			</transition>
-
-			<transition name="fade">
-				<p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
-			</transition>
-
-			<transition name="fade">
-				<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
-			</transition>
-			<transition name="fade">
-				<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
-			</transition>
-
-			<button @click="sleep">Sleep</button>
-			<!-- <button @click="harvestElec">Sleep</button> -->
-
-			<transition name="fade">
-				<div id="upgrades" v-if="daysSlept >= 30">
-					<transition name="fade">
-							<button v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
-					</transition>
-		
-					<transition name="fade">
-						<button v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
-					</transition>
-
-					<transition name="fade">
-						<button v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
-					</transition>
+	<body class="has-background-dark">
+		<section class="section is-paddingless">
+			<section class="hero is-dark">
+				<div class="hero-body is-dark">
+					<h1 class="title">DreamCatcher™</h1>
+					<h2 class="subtitle">An incremental game by JamJam and EwollyGaming.
 				</div>
-			</transition>
+			</section>
 			
-			<br /><br /><button @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
-		</div>
+
+			<div id="app" class="columns is-variable is-6">
+				<div id="activity-panel" class="column has-background-light is-5">
+					<transition name="fade">
+						<div v-if="storyText != ''" v-html="storyText"></div>
+					</transition>
+
+					<transition name="fade">
+						<p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
+					</transition>
+
+					<transition name="fade">
+						<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+					</transition>
+					<transition name="fade">
+						<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+					</transition>
+
+					<button class="button is-primary" @click="sleep">Sleep</button><br />
+					<!-- <button class="button" @click="harvestElec">Sleep</button> -->
+
+					<transition name="fade">
+						<div id="upgrades" v-if="daysSlept >= 30">
+							<transition name="fade">
+									<button class="button" v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
+							</transition>
+				
+							<transition name="fade">
+								<button class="button" v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
+							</transition>
+
+							<transition name="fade">
+								<button class="button" v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
+							</transition>
+						</div>
+					</transition>
+					
+					<br /><br /><button class="button" @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
+				</div>
+
+				<div id="story-panel" class="column is-3 has-background-white-ter">
+					<div class="scrollable">
+						<article class="message">
+						  <div class="message-body">
+						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
+						  </div>
+						</article>
+						<article class="message">
+						  <div class="message-body">
+						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
+						  </div>
+						</article><article class="message">
+						  <div class="message-body">
+						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
+						  </div>
+						</article>
+					</div>
+				</div>
+			</div>
+		</section>
 
 		<script src="DreamCatcher.js"></script>
 	</body>

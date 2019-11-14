@@ -43,7 +43,7 @@ upgrades = {
 		},
 		sleepSchedule: {
 			name 'Sleeping Schedule',
-			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q> Proverbs 19:15',
+			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
 			cost: 50,
 			available: false,
 			acquired: null,
@@ -67,11 +67,8 @@ story = {
 			'What if you could use your time asleep productively?',
 			'<q>Maybe tomorrow,</q> you think, as sleep over takes you.'
 		],
-		trigger: {
-			start: function() { return 10 },
-			end: function() { return 10 },
-		},
-		onDisp: null
+		trigger: function () { return 10 },
+		onDisp: function () {}
 	},
 	secondNight: {
 		lines: [
@@ -80,11 +77,8 @@ story = {
 			'But why else would dream catchers even exist?',
 			'This has to be the use!'
 		],
-		trigger: {
-			start: function() { return 30 },
-			end: function() { return upgrades.dc.acquired },
-		},
-		onDisp: function() { upgrades.dc.available = true }
+		trigger: function () { return 30 },
+		onDisp: function () {}
 	},
 	elec: {
 		lines: [
@@ -92,11 +86,8 @@ story = {
 			'By putting the power back into the grid, the power companys actually sending me money!!',
 			'<b>I NEED MORE!</b>'
 		],
-		trigger: {
-			start: function() { return upgrades.dc.acquired + 10 },
-			end: function() { return upgrades.elec.acquired },
-		}
-		onDisp: function() { upgrades.elec.available = true }
+		trigger: function () { return upgrades.dc.acquired + 10 },
+		onDisp: function () { upgrades.elec.available = true }
 	}
 }
 
@@ -168,32 +159,7 @@ var app = new Vue({
 
 			return outputString;
 		},
-		storyText: function () {
-			if (this.daysSlept >= 10 && this.daysSlept <= 20) {
-				return `<p>
-							As you lay down for your first nights sleep, you begin to think...<br />
-							What if you could use your time asleep productively?<br />
-							Maybe tomorrow you think, as sleep over takes you<br />
-						</p>`
-			} else if (this.daysSlept >= 30 && this.dcPurchased == 0) {
-				return `<p>
-							Could I do something with my dreams?<br />
-							It seems silly, absurd almost...<br />
-							But why else would dream catchers even exist?<br />
-							This has to be the use!
-						</p>`
-			} else if (this.dcPurchased && this.daysSlept >= (this.dcPurchased + 10) && !this.upgrades.electricity) {
-				return `<p>
-							The dream catcher is allowing me to generate power<br />
-							Buy putting the power back into the grid, the power companys actually sending me money!!<br />
-							I NEED MORE<br />
-						</p>`
-			} else {
-				return ''
-			}
-		}
 	},
-
 	methods: {
 		sleep: function () {
 			this.daysSlept++;

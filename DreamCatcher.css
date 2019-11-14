@@ -1,6 +1,39 @@
 html, body {
-	margin: 5px;
+	margin: 0;
 	padding: 0;
+}
+
+#activity-panel {
+	margin-left: 3rem;
+}
+
+#story-panel {
+	position: relative;
+	min-height: 40rem;
+	margin-left: 1rem;
+}
+
+@media all and (max-width: 769px) {
+	#activity-panel {
+		margin: 3rem;
+		margin-bottom: 1.5rem;
+	}
+
+	#story-panel {
+		position: relative;
+		min-height: 40rem;
+		margin: 3rem;
+		margin-top: 1.5rem;
+	}
+}
+
+.scrollable {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow: auto;
 }
 
 .fade-enter-active, .fade-leave-active {
