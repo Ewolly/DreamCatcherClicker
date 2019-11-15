@@ -192,7 +192,6 @@ var app = new Vue({
 					sleepSchedule: false
 				}
 			});
-
 			this.save();
 		},
 		save: function () {
