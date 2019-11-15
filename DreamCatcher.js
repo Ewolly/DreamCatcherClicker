@@ -7,20 +7,19 @@ upgrades = {
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: null,
+			onPickup: function() {},
 			runOnLoad: false
 		},
 		bed: {
 			name: 'New Bed',
 			description: 'The Deluxe Queen Supreme. A good night\'s sleep guaranteed, or your money back!',
 			cost: 400,
-			available: false
+			available: false,
 			acquired: null,
 			onPickup: function() { gameData.muls.bed = 1 },
 			runOnLoad: false
 		}
-	}
-
+	},
 	goodDreams: {
 		elec: {
 			name: 'Generate Electricity?',
@@ -42,7 +41,7 @@ upgrades = {
 			runOnLoad: false
 		},
 		sleepSchedule: {
-			name 'Sleeping Schedule',
+			name: 'Sleeping Schedule',
 			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
 			cost: 50,
 			available: false,
@@ -60,36 +59,36 @@ upgrades = {
 }
 
 // TODO(j): move this to its own file(?)
-story = {
-	firstNight: {
+story = [
+	{
 		lines: [
-			'As you lay down for your first nights sleep, you begin to think...'
+			'As you lay down for your first nights sleep, you begin to think...',
 			'What if you could use your time asleep productively?',
 			'<q>Maybe tomorrow,</q> you think, as sleep over takes you.'
 		],
 		trigger: function () { return 10 },
 		onDisp: function () {}
 	},
-	secondNight: {
+	{
 		lines: [
 			'Could I do something with my dreams?',
 			'It seems silly, absurd almost...',
 			'But why else would dream catchers even exist?',
 			'This has to be the use!'
 		],
-		trigger: function () { return 30 },
-		onDisp: function () {}
+		trigger: function () { return 20 },
+		onDisp: function () { upgrades.money.dc.available = true }
 	},
-	elec: {
+	{
 		lines: [
 			'The dream catcher is allowing me to generate power',
 			'By putting the power back into the grid, the power companys actually sending me money!!',
-			'<b>I NEED MORE!</b>'
+			'<strong>I NEED MORE!</strong>'
 		],
-		trigger: function () { return upgrades.dc.acquired + 10 },
-		onDisp: function () { upgrades.elec.available = true }
+		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 10) },
+		onDisp: function () { upgrades.goodDreams.elec.available = true }
 	}
-}
+]
 
 gameData = {
 	daysSlept: 0,
@@ -99,10 +98,11 @@ gameData = {
 	dcPurchased: 0,
 	upgrades: upgrades,
 	story: story,
+	messages: [],
 	muls: {
 		bed: 0.5,
 		elec: 1
-	}
+	},
 	periods: {
 		elec: 2000,
 		sleep: 1000,
@@ -113,26 +113,25 @@ var app = new Vue({
 	el: '#app',
 	data: gameData,
 	mounted() {
-		if (localStorage.getItem('dcData')) {
-			try {
-				parsed = JSON.parse(localStorage.getItem('dcData'));
-				Object.assign(gameData, parsed);
-			} catch (e) {
-				localStorage.removeItem('dcData');
-			}
-		}
+		// if (localStorage.getItem('dcData')) {
+		// 	try {
+		// 		parsed = JSON.parse(localStorage.getItem('dcData'));
+		// 		Object.assign(gameData, parsed);
+		// 	} catch (e) {
+		// 		localStorage.removeItem('dcData');
+		// 	}
+		// }
 
-		this.$nextTick(function () {
-			window.setInterval(() => {
-				this.save();
-			},1000);
-		})
+		// this.$nextTick(function () {
+		// 	window.setInterval(() => {
+		// 		this.save();
+		// 	},1000);
+		// })
 
-		if (this.upgrades.sleepSchedule) {
-			this.upgrades.sleepSchedule = false;
-			this.startAutoClicker();
-		}
- 
+		// if (this.upgrades.sleepSchedule) {
+		// 	this.upgrades.sleepSchedule = false;
+		// 	this.startAutoClicker();
+		// }
 	},
 	computed: {
 		timeSlept: function () {
@@ -164,14 +163,20 @@ var app = new Vue({
 		sleep: function () {
 			this.daysSlept++;
 
-			if (dcPurchased) {
-				if (this.daysSlept >= 30) {
-					roll = Math.random();
-					if (roll < 0.05) {
-						this.badDreams++;
-					} else if (roll < 0.4) {
-						this.goodDreams++;
-					}
+			for (msg of this.story) {
+				console.log(msg);
+				if (msg.trigger() == this.daysSlept) {
+					msg.onDisp();
+					this.messages.unshift(msg.lines);
+				}
+			}
+
+			if (this.upgrades.money.dc.acquired) {
+				roll = Math.random();
+				if (roll < 0.05) {
+					this.badDreams++;
+				} else if (roll < 0.4) {
+					this.goodDreams++;
 				}
 			}
 		},

@@ -2,7 +2,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
 		<link rel="stylesheet" href="DreamCatcher.css">
 
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -11,73 +11,81 @@
 	<body class="has-background-dark">
 		<section class="section is-paddingless">
 			<section class="hero is-dark">
-				<div class="hero-body is-dark">
+				<div class="hero-body">
 					<h1 class="title">DreamCatcher™</h1>
-					<h2 class="subtitle">An incremental game by JamJam and EwollyGaming.
+					<h2 class="subtitle">An incremental game by JamJam and EwollyGaming.</h2>
 				</div>
 			</section>
-			
+		</section>
 
-			<div id="app" class="columns is-variable is-6">
-				<div id="activity-panel" class="column has-background-light is-5">
-					<transition name="fade">
-						<div v-if="storyText != ''" v-html="storyText"></div>
-					</transition>
-
-					<transition name="fade">
-						<p v-if="daysSlept > 0">Time slept: {{ timeSlept }}</p>
-					</transition>
-
-					<transition name="fade">
-						<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
-					</transition>
-					<transition name="fade">
-						<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
-					</transition>
-
-					<button class="button is-primary" @click="sleep">Sleep</button><br />
-					<!-- <button class="button" @click="harvestElec">Sleep</button> -->
-
-					<transition name="fade">
-						<div id="upgrades" v-if="daysSlept >= 30">
-							<transition name="fade">
-									<button class="button" v-if="!dcPurchased" @click="dcPurchased = daysSlept">Buy Dream Catcher</button> 
-							</transition>
-				
-							<transition name="fade">
-								<button class="button" v-if="!upgrades.electricity && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startElectricity">Investigate Power</button> 
-							</transition>
-
-							<transition name="fade">
-								<button class="button" v-if="!upgrades.sleepSchedule && dcPurchased && daysSlept >= (dcPurchased + 10)" @click="startAutoClicker">Sleep Schedule</button> 
-							</transition>
-						</div>
-					</transition>
-					
-					<br /><br /><button class="button" @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
+		<div id="app" class="columns">
+			<div id="activity-panel" class="column has-background-light is-5 is-offset-1">
+				<div class="level">
+					<div class="level-left">
+							<button class="button is-primary level-item" @click="sleep">Sleep</button>
+						<transition name="fade">
+							<p v-if="daysSlept > 0" class="level-item">Time slept: {{ timeSlept }}</p>
+						</transition>
+					</div>
 				</div>
 
-				<div id="story-panel" class="column is-3 has-background-white-ter">
-					<div class="scrollable">
-						<article class="message">
-						  <div class="message-body">
-						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-						  </div>
-						</article>
-						<article class="message">
-						  <div class="message-body">
-						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-						  </div>
-						</article><article class="message">
-						  <div class="message-body">
-						    Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-						  </div>
-						</article>
+				<div style="display: flex; flex-direction: row; width: 100%">
+					<div style="flex: 1">
+						<div id="money-upgrades" v-for="upgrade in upgrades.money">
+							<transition name="fade">
+									<button class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; upgrade.available = false">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
+							</transition>
+						</div>
+						
+						<div id="good-dream-upgrades" v-for="upgrade in upgrades.goodDreams">
+							<transition name="fade">
+									<button class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; upgrade.available = false">{{ upgrade.name }}<span class="tooltiptext" v-html="upgrade.description"></span></button>
+							</transition>
+						</div>
+
+						<br /><br /><button class="button" @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button>
+					</div>
+					<div v-if="upgrades.money.dc.acquired !== null" style="flex: 1; text-align: center">
+						<img src="images/dreamcatcher.png">
+						<transition name="fade">
+							<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						</transition>
+						<transition name="fade">
+							<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						</transition>
 					</div>
 				</div>
 			</div>
-		</section>
-
+			<div id="story-panel" class="column is-3">
+				<div class="scrollable">
+					<ul id="story-list">
+							<li v-for="msg in messages" class="message story">
+								<transition name="fade">
+									<div class="message-body">
+									<p v-for="line in msg" v-html="line"></p>						    
+								</div>
+						</transition>
+							</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			(function(timer) {
+			window.addEventListener('load', function() {
+				var el = document.querySelector('.scrollable');
+				el.addEventListener('scroll', function(e) {
+					(function(el) {
+						el.classList.add('scroll');
+						clearTimeout(timer);
+						timer = setTimeout(function() {
+							el.classList.remove('scroll');
+						}, 500);
+					})(el);
+				})
+			})
+		})();
+		</script>
 		<script src="DreamCatcher.js"></script>
 	</body>
 </html>
