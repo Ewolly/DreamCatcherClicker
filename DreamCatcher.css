@@ -1,6 +1,117 @@
 html, body {
-	margin: 5px;
+	margin: 0;
 	padding: 0;
+}
+
+#activity-panel {
+	margin-left: 3rem;
+}
+
+#story-panel {
+	overflow: hidden;
+	position: relative;
+	min-height: 40rem;
+	margin-left: 1rem;
+}
+
+@media all and (max-width: 769px) {
+	#activity-panel {
+		margin: 3rem;
+		margin-bottom: 1.5rem;
+	}
+
+	#story-panel {
+		position: relative;
+		min-height: 40rem;
+		margin: 3rem;
+		margin-top: 1.5rem;
+	}
+}
+
+.story:not(:first-child) {
+	opacity: 0.9;
+}
+
+.story:hover {
+	opacity: 1;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.scrollable {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow: auto;
+	padding-right: 10px;
+
+	scrollbar-color: #7f7f7f none; /* thumb and track color */
+	scrollbar-width: 0px;
+}
+
+.scrollable.scroll {
+	padding-right: 2.5px;
+
+  	scrollbar-color: #7f7f7f none; /* thumb and track color */
+	scrollbar-width: thin;
+}
+.scrollable.scroll::-webkit-scrollbar {
+  width: 7.5px;
+}
+
+.scrollable.scroll::-webkit-scrollbar-thumb {
+  background: #7f7f7f;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
 }
 
 .fade-enter-active, .fade-leave-active {
