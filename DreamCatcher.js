@@ -27,33 +27,16 @@ upgrades = {
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: function () {
-				// TODO(j): move this to the game loop
-				this.$nextTick(function () {
-					window.setInterval(() => {
-						if (gameData.goodDreams) {
-							gameData.elec += gameData.muls.elec;
-							gameData.goodDreams--;
-						}
-					}, gameData.periods.elec);
-				})
-			},
+			onPickup: function () {},
 			runOnLoad: false
 		},
 		sleepSchedule: {
 			name: 'Sleeping Schedule',
 			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
 			cost: 50,
-			available: false,
+			available: true,
 			acquired: null,
-			onPickup: function() {
-				// TODO(j): move this to the game loop
-				this.$nextTick(function () {
-					window.setInterval(() => {
-						this.sleep();
-					}, gameData.periods.sleep);
-				})
-			}
+			onPickup: function() {app.gameLoop();}
 		}
 	}
 }
@@ -91,11 +74,13 @@ story = [
 ]
 
 gameData = {
+	tickCount: 0,
+	sleepRate: 1000,
+	tickRate: 4,
 	daysSlept: 0,
 	goodDreams: 0,
 	badDreams: 0,
-	clickTime: 5000,
-	dcPurchased: 0,
+	elec: 0,
 	upgrades: upgrades,
 	story: story,
 	messages: [],
@@ -103,9 +88,8 @@ gameData = {
 		bed: 0.5,
 		elec: 1
 	},
-	periods: {
-		elec: 2000,
-		sleep: 1000,
+	freq: {
+		elec: 1
 	}
 };
 
@@ -113,25 +97,6 @@ var app = new Vue({
 	el: '#app',
 	data: gameData,
 	mounted() {
-		// if (localStorage.getItem('dcData')) {
-		// 	try {
-		// 		parsed = JSON.parse(localStorage.getItem('dcData'));
-		// 		Object.assign(gameData, parsed);
-		// 	} catch (e) {
-		// 		localStorage.removeItem('dcData');
-		// 	}
-		// }
-
-		// this.$nextTick(function () {
-		// 	window.setInterval(() => {
-		// 		this.save();
-		// 	},1000);
-		// })
-
-		// if (this.upgrades.sleepSchedule) {
-		// 	this.upgrades.sleepSchedule = false;
-		// 	this.startAutoClicker();
-		// }
 	},
 	computed: {
 		timeSlept: function () {
@@ -161,10 +126,8 @@ var app = new Vue({
 	},
 	methods: {
 		sleep: function () {
-			this.daysSlept++;
-
+			this.daysSlept++;				
 			for (msg of this.story) {
-				console.log(msg);
 				if (msg.trigger() == this.daysSlept) {
 					msg.onDisp();
 					this.messages.unshift(msg.lines);
@@ -179,37 +142,27 @@ var app = new Vue({
 					this.goodDreams++;
 				}
 			}
-		},
-		devReset: function () {
-			Object.assign(gameData, {
-				daysSlept: 0,
-				goodDreams: 0,
-				badDreams: 0,
-				clickTime: 5000,
-				dcPurchased: 0,
-				upgrades: {
-					electricity: false,
-					sleepSchedule: false
-				}
-			});
-			this.save();
-		},
-		save: function () {
-			const parsed = JSON.stringify(gameData);
-			localStorage.setItem('dcData', parsed);
-		},
-		startElectricity: function () {
-			this.upgrades.electricity = true;
-		},
-		startAutoClicker: function () {
-			if (!this.upgrades.sleepSchedule){
-				this.$nextTick(function () {
-					window.setInterval(() => {
-						this.sleep();
-					},this.clickTime);
-				})
+
+			if(this.upgrades.goodDreams.elec.acquired){
+				this.electricity();
 			}
-			this.upgrades.sleepSchedule = true;
+		},
+		gameLoop: function () {
+			window.setInterval(() => {
+				this.tickCount+=this.tickRate;
+				if (this.tickCount > this.sleepRate){
+					for (let ii = 0; ii < Math.floor(this.tickCount / this.sleepRate); ii++) {
+                        this.sleep();
+                    }
+					this.tickCount = this.tickCount % this.sleepRate;
+				}
+			},this.tickRate);
+		},
+		electricity: function() {
+			if (this.goodDreams >= this.freq.elec) {
+				this.elec += this.muls.elec * this.freq.elec;
+				this.goodDreams -= this.freq.elec;
+			}
 		}
 	}
 })
