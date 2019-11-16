@@ -4,38 +4,36 @@ upgrades = {
 		dc: {
 			name: 'Dream Catcher',
 			description: 'A useless toy from the gypsy fair. Unless...',
+			level: 0,
 			cost: 20, 
 			available: false,
-			isActive: true,
 			acquired: null,
 			onPickup: function() {},
-			runOnLoad: false
 		},
 		bed: {
 			name: 'New Bed',
 			description: 'The Deluxe Queen Supreme. A good night\'s sleep guaranteed, or your money back!',
+			level: 0,
 			cost: 400,
 			available: false,
 			acquired: null,
 			onPickup: function() { gameData.muls.bed = 1 },
-			runOnLoad: false
 		}
 	},
 	goodDreams: {
 		elec: {
 			name: 'Generate Electricity?',
 			description: 'Surely there\'s <i>someway</i> to use this power...',
+			level: 0,
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: function () {
-				gameData
-			},
-			runOnLoad: false
+			onPickup: function () { },
 		},
 		sleepSchedule: {
 			name: 'Sleeping Schedule',
 			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
+			level: 0,
 			cost: 5,
 			available: true,
 			acquired: null,
@@ -173,6 +171,18 @@ var app = new Vue({
 				this.money += this.muls.elec * this.freq.elec;
 				this.goodDreams -= this.freq.elec;
 			}
+		},
+		buyUpgrade: function(upgrade, currency) {
+			if (this[currency] < upgrade.cost) {
+				return;
+			}
+			upgrade.onPickup(); 
+			upgrade.acquired = this.daysSlept;
+			
+			this[currency] -= upgrade.cost;
+			
+			upgrade.cost = Math.floor(upgrade.cost * 1.2);
+			upgrade.level++;
 		}
 	}
 })
