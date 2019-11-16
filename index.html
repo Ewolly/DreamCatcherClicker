@@ -46,9 +46,12 @@
 							<tbody>
 								<tr v-if="upgrade.available" v-for="upgrade in upgrades.money">
 									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
-									<td class="tooltip">
+									<td>
+										<span class="icon has-text-info tooltip">
+										  <i class="fas fa-info-circle"></i>
+											<span class="tooltiptext" v-html="upgrade.description"></span>
+										</span>
 										<strong>{{ upgrade.name }}</strong>
-										<span class="tooltiptext" v-html="upgrade.description"></span>
 									</td>
 									<td>${{ upgrade.cost }}</td>
 									<td>
@@ -68,11 +71,11 @@
 								<tr v-if="upgrade.available" v-for="upgrade in upgrades.goodDreams">
 									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
 									<td>
+										<span class="icon has-text-info tooltip">
+										  <i class="fas fa-info-circle"></i>
+											<span class="tooltiptext" v-html="upgrade.description"></span>
+										</span>
 										<strong>{{ upgrade.name }}</strong>
-											<span class="icon has-text-info tooltip">
-											  <i class="fas fa-info-circle"></i>
-												<span class="tooltiptext" v-html="upgrade.description"></span>
-											</span>
 									</td>
 									<td>{{ upgrade.cost }} <abbr title="Good Dreams">g.d.</abbr></td>
 									<td>
