@@ -1,125 +1,168 @@
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-		<link rel="stylesheet" href="DreamCatcher.css">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+	<link rel="stylesheet" href="DreamCatcher.css">
+	
+	<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
 
-		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	</head>
-
-	<body class="has-background-dark">
-		<section class="section is-paddingless">
-			<section class="hero is-dark">
-				<div class="hero-body">
-					<h1 class="title">DreamCatcher™</h1>
-					<h2 class="subtitle">An incremental game by JamJam and EwollyGaming.</h2>
-				</div>
-			</section>
+<body class="has-background-dark">
+	<!-- "hero" - full width element at the top of the screen that gives has the title. -->
+	<section class="section is-paddingless">
+		<section class="hero is-dark">
+			<div class="hero-body">
+				<h1 class="title">DreamCatcher™</h1>
+				<h2 class="subtitle">An incremental game by JamJam and EwollyGaming.</h2>
+			</div>
 		</section>
+	</section>
 
-		<div id="app" class="columns">
-			<div id="activity-panel" class="column has-background-light is-5 is-offset-1">
-				<div class="level">
-					<div class="level-left">
-							<button class="button is-primary level-item" @click="sleep">Sleep</button>
-						<transition name="fade">
-							<p v-if="daysSlept > 0" class="level-item">Time slept: {{ timeSlept }}</p>
-						</transition>
-						<transition name="fade">
-							<p class="level-item">Money: ${{ money }}</p>
-						</transition>
-					</div>
+	<div id="app" class="columns">
+		<!-- main content area -->
+		<div id="activity-panel" class="column has-background-light is-8">
+			<div class="level">
+				<div class="level-left">
+					<button class="button is-primary level-item" @click="sleep">Sleep</button>
+					<transition name="fade">
+						<p v-if="daysSlept > 0" class="level-item">Time slept: {{ timeSlept }}</p>
+					</transition>
 				</div>
-
-				<div style="display: flex; flex-direction: row; width: 100%">
-					<div style="flex: 1">
-						<div id="money-upgrades" v-for="upgrade in upgrades.money">
-							<transition name="fade">
-								<button v-bind:disabled="money < upgrade.cost" class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; money -= upgrade.cost; upgrade.cost *= 1.3">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
-							</transition>
-							<span v-if="upgrade.available" class="level-item">Cost: ${{ upgrade.cost }}</span>	
-						</div>
-						
-						<div id="good-dream-upgrades" v-for="upgrade in upgrades.goodDreams">
-							<transition name="fade">
-								<button v-bind:disabled="goodDreams < upgrade.cost" class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; goodDreams -= upgrade.cost; upgrade.cost *= 1.3">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
-							</transition>
-						</div>
-
-						<!-- <br /><br /><button class="button" @click="devReset" style="position: fixed; bottom: 10">(DEV) Reset</button> -->
-					</div>
-					<div v-if="upgrades.money.dc.acquired !== null" style="flex: 1; text-align: center">
-						<img src="images/dreamcatcher.png">
-						<transition name="fade">
-							<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
-						</transition>
-						<transition name="fade">
-							<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
-						</transition>
-					</div>
-				</div>
-				<div class="columns">
-					<div class="column">
-						<div class="panel">
-							<p class="has-text-centered">Electricity</p>
-							<div class="table">
-								<tbody>
-									<tr>
-										<td>Generation Rate:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-									<tr>
-										<td>Toggle Conversion:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-									<tr>
-										<td>Price per MW:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-								</tbody>
-							</div>
-						</div>
-					</div>
-					<div class="column">
-						<div class="panel">
-							<p class="has-text-centered">Electricity</p>
-							<div class="table">
-								<tbody>
-									<tr>
-										<td>Generation Rate:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-									<tr>
-										<td>Toggle Conversion:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-									<tr>
-										<td>Price per MW:</td>
-										<td> {{muls.elec}} </td>
-									</tr>
-								</tbody>
-							</div>
-						</div>
-					</div>
+				<div class="level-right">
+					<transition name="fade">
+						<p v-if="daysSlept > 15" class="level-item">Money: ${{ money }}</p>
+					</transition>
 				</div>
 			</div>
-			<div id="story-panel" class="column is-3">
-				<div class="scrollable">
-					<ul id="story-list">
-							<li v-for="msg in messages" class="message story">
-								<transition name="fade">
-									<div class="message-body">
-									<p v-for="line in msg" v-html="line"></p>						    
-								</div>
-						</transition>
-							</li>
-					</ul>
+
+			<div class="columns">
+				<div class="column">
+					<div v-if="upgrades.money.dc.available">
+						<h3>The local shop</h3>
+						<hr />
+						<table class="upgrades-table table is-striped is-fullwidth">
+							<tbody>
+								<tr v-if="upgrade.available" v-for="upgrade in upgrades.money">
+									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
+									<td>
+										<span class="icon has-text-info tooltip">
+										  <i class="fas fa-info-circle"></i>
+											<span class="tooltiptext" v-html="upgrade.description"></span>
+										</span>
+										<strong>{{ upgrade.name }}</strong>
+									</td>
+									<td>${{ upgrade.cost }}</td>
+									<td>
+										<a v-bind:disabled="money < upgrade.cost" class="button" @click="buyUpgrade(upgrade, 'money');">
+											Buy
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div v-if="upgrades.goodDreams.elec.available">
+						<h3>The local shop</h3>
+						<hr />
+						<table class="upgrades-table table is-striped is-fullwidth">
+							<tbody>
+								<tr v-if="upgrade.available" v-for="upgrade in upgrades.goodDreams">
+									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
+									<td>
+										<span class="icon has-text-info tooltip">
+										  <i class="fas fa-info-circle"></i>
+											<span class="tooltiptext" v-html="upgrade.description"></span>
+										</span>
+										<strong>{{ upgrade.name }}</strong>
+									</td>
+									<td>{{ upgrade.cost }} <abbr title="Good Dreams">g.d.</abbr></td>
+									<td>
+										<a v-bind:disabled="goodDreams < upgrade.cost" class="button" @click="buyUpgrade(upgrade, 'goodDreams');">
+											Buy
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="columns">
+						<div class="column">
+							<div class="panel">
+								<p class="has-text-centered">Electricity</p>
+								<table class="table is-fullwidth">
+									<tbody>
+										<tr>
+											<td>Generation Rate:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+										<tr>
+											<td>Toggle Conversion:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+										<tr>
+											<td>Price per MW:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="column">
+							<div class="panel">
+								<p class="has-text-centered">Electricity</p>
+								<table class="table is-fullwidth">
+									<tbody>
+										<tr>
+											<td>Generation Rate:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+										<tr>
+											<td>Toggle Conversion:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+										<tr>
+											<td>Price per MW:</td>
+											<td> {{muls.elec}} </td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div v-if="upgrades.money.dc.acquired !== null" class="column is-4">
+					<img src="images/dreamcatcher.png">
+					<transition name="fade">
+						<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+					</transition>
+					<transition name="fade">
+						<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+					</transition>
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
-			(function(timer) {
+
+		<!-- right hand side of the screen, used for displaying messages -->
+		<div id="story-panel" class="column is-3">
+			<div class="scrollable">
+				<ul id="story-list">
+					<li v-for="msg in messages" class="message story">
+						<transition name="fade">
+							<div class="message-body">
+								<p v-for="line in msg" v-html="line"></p>						    
+							</div>
+						</transition>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		(function(timer) {
 			window.addEventListener('load', function() {
 				var el = document.querySelector('.scrollable');
 				el.addEventListener('scroll', function(e) {
@@ -133,7 +176,8 @@
 				})
 			})
 		})();
-		</script>
-		<script src="DreamCatcher.js"></script>
-	</body>
+	</script>
+	
+	<script src="DreamCatcher.js"></script>
+</body>
 </html>

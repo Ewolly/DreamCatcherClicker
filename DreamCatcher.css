@@ -3,6 +3,10 @@ html, body {
 	padding: 0;
 }
 
+td {
+  vertical-align: middle!important;
+}
+
 #activity-panel {
 	margin-left: 3rem;
 }
