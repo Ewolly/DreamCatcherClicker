@@ -6,6 +6,7 @@ upgrades = {
 			description: 'A useless toy from the gypsy fair. Unless...',
 			cost: 20, 
 			available: false,
+			isActive: true,
 			acquired: null,
 			onPickup: function() {},
 			runOnLoad: false
@@ -27,16 +28,24 @@ upgrades = {
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: function () {},
+			onPickup: function () {
+				gameData
+			},
 			runOnLoad: false
 		},
 		sleepSchedule: {
 			name: 'Sleeping Schedule',
 			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
-			cost: 50,
+			cost: 5,
 			available: true,
 			acquired: null,
-			onPickup: function() {app.gameLoop();}
+			onPickup: function() {
+				if(!this.acquired){
+					app.gameLoop()
+				} else {
+					gameData.sleepRate *=.95;
+				}
+			}
 		}
 	}
 }
@@ -78,6 +87,7 @@ gameData = {
 	sleepRate: 1000,
 	tickRate: 4,
 	daysSlept: 0,
+	money: 40,
 	goodDreams: 0,
 	badDreams: 0,
 	elec: 0,
@@ -160,7 +170,7 @@ var app = new Vue({
 		},
 		electricity: function() {
 			if (this.goodDreams >= this.freq.elec) {
-				this.elec += this.muls.elec * this.freq.elec;
+				this.money += this.muls.elec * this.freq.elec;
 				this.goodDreams -= this.freq.elec;
 			}
 		}

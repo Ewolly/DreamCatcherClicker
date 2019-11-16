@@ -26,6 +26,9 @@
 						<transition name="fade">
 							<p v-if="daysSlept > 0" class="level-item">Time slept: {{ timeSlept }}</p>
 						</transition>
+						<transition name="fade">
+							<p class="level-item">Money: ${{ money }}</p>
+						</transition>
 					</div>
 				</div>
 
@@ -33,13 +36,14 @@
 					<div style="flex: 1">
 						<div id="money-upgrades" v-for="upgrade in upgrades.money">
 							<transition name="fade">
-									<button class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; upgrade.available = false">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
+								<button v-bind:disabled="money < upgrade.cost" class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; money -= upgrade.cost; upgrade.cost *= 1.3">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
 							</transition>
+							<span v-if="upgrade.available" class="level-item">Cost: ${{ upgrade.cost }}</span>	
 						</div>
 						
 						<div id="good-dream-upgrades" v-for="upgrade in upgrades.goodDreams">
 							<transition name="fade">
-									<button class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; upgrade.available = false">{{ upgrade.name }}<span class="tooltiptext" v-html="upgrade.description"></span></button>
+								<button v-bind:disabled="goodDreams < upgrade.cost" class="button tooltip" v-if="upgrade.available" @click="upgrade.onPickup(); upgrade.acquired = daysSlept; goodDreams -= upgrade.cost; upgrade.cost *= 1.3">{{ upgrade.name }}<span class="tooltiptext">{{ upgrade.description }}</span></button>
 							</transition>
 						</div>
 
