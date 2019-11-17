@@ -5,19 +5,34 @@ upgrades = {
 			name: 'Dream Catcher',
 			description: 'A useless toy from the gypsy fair. Unless...',
 			level: 0,
+			maxLevel: 9999,
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: function() {},
+			onPickup: function() { this.description = 'Two is better than one, right?'; },
 		},
 		bed: {
 			name: 'New Bed',
 			description: 'The Deluxe Queen Supreme. A good night\'s sleep guaranteed, or your money back!',
 			level: 0,
+			maxLevel: 4,
 			cost: 400,
 			available: false,
 			acquired: null,
-			onPickup: function() { gameData.muls.bed = 1 },
+			onPickup: function() { 
+				gameData.muls.bed *= 1.2;
+			},
+		},
+		generator: {
+			name: 'Power Generator',
+			description: '<strong>MAXIMUM POWER!</strong>',
+			level: 1,
+			maxLevel: 9999,
+			cost: 40,
+			available: false,
+			acquired: null,
+			onPickup: function() { }
+
 		}
 	},
 	goodDreams: {
@@ -25,15 +40,30 @@ upgrades = {
 			name: 'Generate Electricity?',
 			description: 'Surely there\'s <i>someway</i> to use this power...',
 			level: 0,
+			maxLevel: 1,
 			cost: 20, 
 			available: false,
 			acquired: null,
-			onPickup: function () { },
+			onPickup: function () { 
+				upgrades.money.generator.available = true;
+				upgrades.goodDreams.improveElec.available = true;
+			},
+		},
+		improveElec: {
+			name: 'Improve Generator',
+			description: 'A resistor here, a capacitor there...',
+			level: 1,
+			maxLevel: 9999,
+			cost: 100,
+			available: false,
+			acquired: null,
+			onPickup: function () { gameData.muls.elec *= 1.2; }
 		},
 		sleepSchedule: {
 			name: 'Sleeping Schedule',
 			description: '<q>Laziness casts into a deep sleep, And an idle man will suffer hunger.</q><br />Proverbs 19:15',
 			level: 0,
+			maxLevel: 9999,
 			cost: 5,
 			available: true,
 			acquired: null,
@@ -49,7 +79,7 @@ upgrades = {
 }
 
 // TODO(j): move this to its own file(?)
-story = [
+events = [
 	{
 		lines: [
 			'As you lay down for your first nights sleep, you begin to think...',
@@ -77,6 +107,11 @@ story = [
 		],
 		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 10) },
 		onDisp: function () { upgrades.goodDreams.elec.available = true }
+	},
+	{
+		lines: false,
+		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 5) },
+		onDisp: function () { upgrades.money.bed.available = true }
 	}
 ]
 
@@ -90,7 +125,7 @@ gameData = {
 	badDreams: 0,
 	elec: 0,
 	upgrades: upgrades,
-	story: story,
+	events: events,
 	messages: [],
 	muls: {
 		bed: 0.5,
@@ -133,43 +168,54 @@ var app = new Vue({
 		},
 	},
 	methods: {
-		sleep: function () {
-			this.daysSlept++;				
-			for (msg of this.story) {
-				if (msg.trigger() == this.daysSlept) {
+		sleep: function (sleepCount) {
+			if (sleepCount === 0) {
+				return false;
+			}
+
+			this.daysSlept += sleepCount;
+
+			for (msg of this.events) {
+				if ((msg.trigger() <= this.daysSlept) && (msg.trigger() > this.daysSlept - sleepCount)) {
 					msg.onDisp();
-					this.messages.unshift(msg.lines);
+					if (msg.lines) {
+						this.messages.unshift(msg.lines);
+					}
 				}
 			}
 
-			if (this.upgrades.money.dc.acquired) {
-				roll = Math.random();
-				if (roll < 0.05) {
+			for (let ii = 0; ii < (sleepCount * this.upgrades.money.dc.level); ii++) {
+				roll = Math.random()*this.muls.bed;
+				if (roll < 0.1) {
 					this.badDreams++;
-				} else if (roll < 0.4) {
+					roll = Math.random()*this.muls.bed;
+				} 
+
+				if (roll < 0.8) {
 					this.goodDreams++;
 				}
 			}
 
-			if(this.upgrades.goodDreams.elec.acquired){
-				this.electricity();
+			for (let ii = 0; ii < sleepCount; ii++) {
+				if(this.upgrades.goodDreams.elec.acquired){
+					this.electricity();
+				}
 			}
+
+			return true;
 		},
 		gameLoop: function () {
 			window.setInterval(() => {
-				this.tickCount+=this.tickRate;
-				if (this.tickCount > this.sleepRate){
-					for (let ii = 0; ii < Math.floor(this.tickCount / this.sleepRate); ii++) {
-                        this.sleep();
-                    }
+				this.tickCount += this.tickRate;
+                if (this.sleep(Math.floor(this.tickCount / this.sleepRate))) {
 					this.tickCount = this.tickCount % this.sleepRate;
-				}
-			},this.tickRate);
+                }
+			}, this.tickRate);
 		},
 		electricity: function() {
-			if (this.goodDreams >= this.freq.elec) {
-				this.money += this.muls.elec * this.freq.elec;
-				this.goodDreams -= this.freq.elec;
+			if (this.goodDreams >= this.upgrades.money.generator.level) {
+				this.money += this.muls.elec * this.upgrades.money.generator.level;
+				this.goodDreams -= this.upgrades.money.generator.level;
 			}
 		},
 		buyUpgrade: function(upgrade, currency) {
@@ -177,11 +223,13 @@ var app = new Vue({
 				return;
 			}
 			upgrade.onPickup(); 
-			upgrade.acquired = this.daysSlept;
+			if (!upgrade.acquired) {
+				upgrade.acquired = this.daysSlept;
+			}
 			
 			this[currency] -= upgrade.cost;
 			
-			upgrade.cost = Math.floor(upgrade.cost * 1.2);
+			upgrade.cost = Math.floor(upgrade.cost * 1.3);
 			upgrade.level++;
 		}
 	}

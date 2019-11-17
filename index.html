@@ -25,14 +25,14 @@
 		<div id="activity-panel" class="column has-background-light is-8">
 			<div class="level">
 				<div class="level-left">
-					<button class="button is-primary level-item" @click="sleep">Sleep</button>
+					<button class="button is-primary level-item" @click="sleep(1)">Sleep</button>
 					<transition name="fade">
 						<p v-if="daysSlept > 0" class="level-item">Time slept: {{ timeSlept }}</p>
 					</transition>
 				</div>
 				<div class="level-right">
 					<transition name="fade">
-						<p v-if="daysSlept > 15" class="level-item">Money: ${{ money }}</p>
+						<p v-if="daysSlept > 15" class="level-item">Money: ${{ money < 1000 ? Math.round(money*100)/100 : Math.round(money) }}</p>
 					</transition>
 				</div>
 			</div>
@@ -40,46 +40,48 @@
 			<div class="columns">
 				<div class="column">
 					<div v-if="upgrades.money.dc.available">
-						<h3>The local shop</h3>
-						<hr />
-						<table class="upgrades-table table is-striped is-fullwidth">
+						<h3 class="subtitle">The local shop</h3>
+						<table class="upgrades-table table is-fullwidth">
 							<tbody>
-								<tr v-if="upgrade.available" v-for="upgrade in upgrades.money">
-									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
-									<td>
-										<span class="icon has-text-info tooltip">
-										  <i class="fas fa-info-circle"></i>
-											<span class="tooltiptext" v-html="upgrade.description"></span>
-										</span>
-										<strong>{{ upgrade.name }}</strong>
-									</td>
-									<td>${{ upgrade.cost }}</td>
-									<td>
-										<a v-bind:disabled="money < upgrade.cost" class="button" @click="buyUpgrade(upgrade, 'money');">
-											Buy
-										</a>
-									</td>
-								</tr>
+								<transition class="fade">
+									<tr v-if="upgrade.available && (upgrade.level < upgrade.maxLevel)" v-for="upgrade in upgrades.money">
+										<td width="10%">{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
+										<td width="55%">
+											<span class="icon has-text-info tooltip">
+											  <i class="fas fa-info-circle"></i>
+												<span class="tooltiptext" v-html="upgrade.description"></span>
+											</span>
+											<strong>{{ upgrade.name }}</strong>
+										</td>
+										<td width="20%">${{ upgrade.cost }}</td>
+										<td width="15%">
+											<a v-bind:disabled="money < upgrade.cost" class="button is-info" @click="buyUpgrade(upgrade, 'money');">
+												Buy
+											</a>
+										</td>
+									</tr>
+								</transition>
 							</tbody>
 						</table>
 					</div>
+
 					<div v-if="upgrades.goodDreams.elec.available">
-						<h3>The local shop</h3>
-						<hr />
+						<p>&nbsp;</p>
+						<h3 class="subtitle">The Research Lab! <span style="font-size: 50%">(your garage)</span></h3>
 						<table class="upgrades-table table is-striped is-fullwidth">
 							<tbody>
-								<tr v-if="upgrade.available" v-for="upgrade in upgrades.goodDreams">
-									<td>{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
-									<td>
+								<tr v-if="upgrade.available && (upgrade.level < upgrade.maxLevel)" v-for="upgrade in upgrades.goodDreams">
+									<td width="10%">{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
+									<td width="55%">
 										<span class="icon has-text-info tooltip">
 										  <i class="fas fa-info-circle"></i>
 											<span class="tooltiptext" v-html="upgrade.description"></span>
 										</span>
 										<strong>{{ upgrade.name }}</strong>
 									</td>
-									<td>{{ upgrade.cost }} <abbr title="Good Dreams">g.d.</abbr></td>
-									<td>
-										<a v-bind:disabled="goodDreams < upgrade.cost" class="button" @click="buyUpgrade(upgrade, 'goodDreams');">
+									<td width="20%">{{ upgrade.cost }} <abbr title="Good Dreams">g.d.</abbr></td>
+									<td width="15%">
+										<a v-bind:disabled="goodDreams < upgrade.cost" class="button is-info" @click="buyUpgrade(upgrade, 'goodDreams');">
 											Buy
 										</a>
 									</td>
@@ -87,48 +89,53 @@
 							</tbody>
 						</table>
 					</div>
+					<p>&nbsp;</p>
 					<div class="columns">
 						<div class="column">
-							<div class="panel">
-								<p class="has-text-centered">Electricity</p>
-								<table class="table is-fullwidth">
-									<tbody>
-										<tr>
-											<td>Generation Rate:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-										<tr>
-											<td>Toggle Conversion:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-										<tr>
-											<td>Price per MW:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
+							<transition class="fade">
+								<div class="panel" v-if="upgrades.money.generator.level >= 2">
+									<p class="has-text-centered has-background-dark has-text-white">Electricity</p>
+									<table class="table is-fullwidth">
+										<tbody>
+											<tr>
+												<td>Generation Efficiency:</td>
+												<td>${{muls.elec}} / g.d.</td>
+											</tr>
+											<tr>
+												<td>Amount Consumed:</td>
+												<td>{{upgrades.money.generator.level}} g.d. / night</td>
+											</tr>
+											<tr>
+												<td>Toggle Conversion:</td>
+												<td>Not done 😲</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</transition>
 						</div>
 						<div class="column">
-							<div class="panel">
-								<p class="has-text-centered">Electricity</p>
-								<table class="table is-fullwidth">
-									<tbody>
-										<tr>
-											<td>Generation Rate:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-										<tr>
-											<td>Toggle Conversion:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-										<tr>
-											<td>Price per MW:</td>
-											<td> {{muls.elec}} </td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
+							<transition class="fade">
+								<div class="panel" v-if="upgrades.money.bed.acquired">
+									<p class="has-text-centered has-background-dark has-text-white">Bed</p>
+									<table class="table is-fullwidth">
+										<tbody>
+											<tr>
+												<td>You have:</td>
+												<td>bed</td>
+											</tr>
+											<tr>
+												<td>Bed is level:</td>
+												<td>{{upgrades.money.bed.level}}</td>
+											</tr>
+											<tr>
+												<td>This is:</td>
+												<td>placeholder (😁)</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</transition>
 						</div>
 					</div>
 				</div>
