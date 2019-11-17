@@ -75,6 +75,28 @@ upgrades = {
 				}
 			}
 		}
+	},
+	badDreams: {
+		goodCap: {
+			name: 'Increase Good Dream Capacity',
+			description: 'Hmm, maybe if this middle string were slightly to the left...',
+			level: 1,
+			maxLevel: 9999,
+			cost: 2,
+			available: false,
+			acquired: null,
+			onPickup: function() { },
+		},
+		badCap: {
+			name: 'Increase Bad Dream Capacity',
+			description: 'No no, this is all <strong>wrong</strong>! It should be here!',
+			level: 1,
+			maxLevel: 9999,
+			cost: 4,
+			available: false,
+			acquired: null,
+			onPickup: function() { },
+		},
 	}
 }
 
@@ -82,37 +104,89 @@ upgrades = {
 events = [
 	{
 		lines: [
-			'As you lay down for your first nights sleep, you begin to think...',
-			'What if you could use your time asleep productively?',
-			'<q>Maybe tomorrow,</q> you think, as sleep over takes you.'
+			'As you lay down for yet another nights\' sleep, you\'re struck with a thought.',
+			'<q>I spend so much of my life asleep. There must be a better use for it.</q>',
+			'<q>Maybe tomorrow,</q> you think, as sleep overtakes you.'
 		],
 		trigger: function () { return 10 },
 		onDisp: function () {}
 	},
 	{
 		lines: [
-			'Could I do something with my dreams?',
-			'It seems silly, absurd almost...',
-			'But why else would dream catchers even exist?',
-			'This has to be the use!'
+			'You awaken with a start in the middle of the night, sweating profusely.',
+			'<q>That was terrible... It felt so real!</q> You think to yourself, a spark forming in your mind as you settle back down to rest.',
 		],
-		trigger: function () { return 20 },
+		trigger: function () { return 12 },
+		onDisp: function () {}
+	},
+	{
+		lines: [
+			'<q>Could I do something with my dreams?</q>',
+			'It seems silly, absurd almost - but dreams can be so powerful, there must be more to them!',
+			'Maybe a dream catcher could shed some light on the issue?',
+			'<q>This has to be the use!</q> You exclaim, deciding to get one to experiment with.'
+		],
+		trigger: function () { return 15 },
 		onDisp: function () { upgrades.money.dc.available = true }
 	},
 	{
 		lines: [
-			'The dream catcher is allowing me to generate power',
-			'By putting the power back into the grid, the power companys actually sending me money!!',
-			'<strong>I NEED MORE!</strong>'
+			'After waking up from a particularly pleasant dream, you notice a slight glow from the lamp beside your dream catcher.',
+			'It vanishes almost as soon as you wake up, but you <strong>know</strong> you saw it.',
+			'You decide to investigate as soon as you get the chance.'
 		],
-		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 10) },
+		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 5) },
 		onDisp: function () { upgrades.goodDreams.elec.available = true }
+	},
+	{
+		lines: [
+			'<q>My tinkering has paid off!</q> You proclaim proudly, checking your bank account.',
+			'<pre>Power r us: <span style="color: green">+$10</span></pre>',
+			'You are able to use the good dreams captured to generate electricity.',
+			'By putting the power back into the grid, the power company is actually sending you money!',
+		],
+		trigger: function () { return (upgrades.goodDreams.elec.acquired ? upgrades.goodDreams.elec.acquired+1 : null) },
+		onDisp: function () { 
+			app.money += 10;
+		}
 	},
 	{
 		lines: false,
 		trigger: function () { return (upgrades.money.dc.acquired === null ? null : upgrades.money.dc.acquired + 5) },
 		onDisp: function () { upgrades.money.bed.available = true }
-	}
+	},
+	{
+		lines: [
+			'You\'re starting to get a feel for the dream catcher at this point, and you notice each one can only hold a certain amount of dreams.',
+			'You try tweaking a string, when a strong feeling of <span style="font-size: 125%"><strong>IMPENDING DOOM</strong></span> rolls over you.',
+			'You curse in shock <q>!$@!@, is this a <span style="color: red">bad dream?</span></q> ...before reaching back in again to do the same thing.',
+			'<q>I can use this...</q> You say to yourself, sinisterly',
+		],
+		trigger: function () {
+			if (!this.triggered && upgrades.money.dc.level && (gameData.goodDreams >= (app.goodDreamCap - 5*upgrades.money.dc.level))) {
+				this.triggered = gameData.daysSlept;
+			}
+			return this.triggered;
+		},
+		triggered: null,
+		onDisp: function () { 
+			badDreams = 1
+			upgrades.badDreams.goodCap.available = true;
+		}
+	},
+	{
+		lines: false,
+		trigger: function () {
+			if (!this.triggered && upgrades.money.dc.level && (gameData.badDreams >= (app.badDreamCap - upgrades.money.dc.level))) {
+				this.triggered = gameData.daysSlept;
+			}
+			return this.triggered;
+		},
+		triggered: null,
+		onDisp: function () { 
+			upgrades.badDreams.badCap.available = true;
+		}
+	},
 ]
 
 gameData = {
@@ -166,6 +240,12 @@ var app = new Vue({
 
 			return outputString;
 		},
+		goodDreamCap: function() {
+			return (this.upgrades.money.dc.level * this.upgrades.badDreams.goodCap.level * 25);
+		},
+		badDreamCap: function() {
+			return (this.upgrades.money.dc.level * this.upgrades.badDreams.badCap.level * 5);
+		}
 	},
 	methods: {
 		sleep: function (sleepCount) {
@@ -185,14 +265,12 @@ var app = new Vue({
 			}
 
 			for (let ii = 0; ii < (sleepCount * this.upgrades.money.dc.level); ii++) {
-				roll = Math.random()*this.muls.bed;
-				if (roll < 0.1) {
+				roll = Math.random()/this.muls.bed;
+				if (this.upgrades.badDreams.goodCap.available && roll < 0.05) {
 					this.badDreams++;
-					roll = Math.random()*this.muls.bed;
 				} 
-
-				if (roll < 0.8) {
-					this.goodDreams++;
+				else if (this.upgrades.goodDreams.elec.available && roll < 0.8) {
+					this.goodDreams++
 				}
 			}
 
@@ -229,7 +307,7 @@ var app = new Vue({
 			
 			this[currency] -= upgrade.cost;
 			
-			upgrade.cost = Math.floor(upgrade.cost * 1.3);
+			upgrade.cost = Math.ceil(upgrade.cost * 1.3);
 			upgrade.level++;
 		}
 	}

@@ -68,7 +68,7 @@
 					<div v-if="upgrades.goodDreams.elec.available">
 						<p>&nbsp;</p>
 						<h3 class="subtitle">The Research Lab! <span style="font-size: 50%">(your garage)</span></h3>
-						<table class="upgrades-table table is-striped is-fullwidth">
+						<table class="upgrades-table table is-fullwidth">
 							<tbody>
 								<tr v-if="upgrade.available && (upgrade.level < upgrade.maxLevel)" v-for="upgrade in upgrades.goodDreams">
 									<td width="10%">{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
@@ -86,6 +86,23 @@
 										</a>
 									</td>
 								</tr>
+								<tr v-if="upgrade.available && (upgrade.level < upgrade.maxLevel)" v-for="upgrade in upgrades.badDreams">
+									<td width="10%">{{ upgrade.level > 0 ? upgrade.level : '' }}</td>
+									<td width="55%">
+										<span class="icon has-text-info tooltip">
+										  <i class="fas fa-info-circle"></i>
+											<span class="tooltiptext" v-html="upgrade.description"></span>
+										</span>
+										<strong>{{ upgrade.name }}</strong>
+									</td>
+									<td width="20%">{{ upgrade.cost }} <abbr title="Bad Dreams">b.d.</abbr></td>
+									<td width="15%">
+										<a v-bind:disabled="badDreams < upgrade.cost" class="button is-info" @click="buyUpgrade(upgrade, 'badDreams');">
+											Buy
+										</a>
+									</td>
+								</tr>
+
 							</tbody>
 						</table>
 					</div>
@@ -143,10 +160,10 @@
 				<div v-if="upgrades.money.dc.acquired !== null" class="column is-4">
 					<img src="images/dreamcatcher.png">
 					<transition name="fade">
-						<p v-if="goodDreams > 0">You have collected {{ goodDreams }} good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						<p v-if="goodDreams > 0">You have collected <strong>{{ goodDreams }}{{ upgrades.badDreams.goodCap.available ? '/' + goodDreamCap : '' }}</strong> good {{ goodDreams > 1 ? 'dreams' : 'dream'}}.</p>
 					</transition>
 					<transition name="fade">
-						<p v-if="badDreams > 0">You have collected {{ badDreams }} bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
+						<p v-if="badDreams > 0">You have collected <strong>{{ badDreams }}{{ upgrades.badDreams.badCap.available ? '/' + badDreamCap : '' }}</strong> bad {{ badDreams > 1 ? 'dreams' : 'dream'}}.</p>
 					</transition>
 				</div>
 			</div>
